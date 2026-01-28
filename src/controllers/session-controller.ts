@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "@/database/prisma";
+import { authConfig } from "@/configs/auth";
+import { sign } from "jsonwebtoken";
 import { AppError } from "@/utils/AppError";
 import { compare } from "bcrypt";
 import { z } from "zod";
@@ -27,7 +29,14 @@ class SessionsController {
       throw new AppError("Email ou senha inválidos", 401);
     }
 
-    return response.json({ message: "Sessão criada com sucesso!" });
+    const { secret, expiresIn } = authConfig.jwt;
+
+    const token = sign({ role: user.role ?? "customer" }, secret, {
+      subject: user.id,
+      expiresIn,
+    })
+
+    return response.json({ message: "Sessão criada com sucesso!", token });
   }
 }
 
