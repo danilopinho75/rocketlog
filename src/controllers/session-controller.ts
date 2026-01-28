@@ -36,7 +36,9 @@ class SessionsController {
       expiresIn,
     })
 
-    return response.json({ message: "Sessão criada com sucesso!", token });
+    const { password: hashedPassword, ...userWithoutPassword } = user;
+
+    return response.json({ token, user: userWithoutPassword });
   }
 }
 
